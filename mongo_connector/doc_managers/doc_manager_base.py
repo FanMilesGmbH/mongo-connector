@@ -75,14 +75,15 @@ class DocManagerBase(object):
             try:
                 if "." in to_unset:
                     path = to_unset.split(".")
-                    where = _retrieve_path(doc, path[:-1])
+                    where = _retrieve_path(doc, path[:-1], create=True)
                     index_or_key = _convert_or_raise(where, path[-1])
                     if isinstance(where, list):
                         # Unset an array element sets it to null.
                         where[index_or_key] = None
                     else:
-                        # Unset field removes it entirely.
-                        del where[index_or_key]
+                        if index_or_key in where:
+                            # Unset field removes it entirely.
+                            del where[index_or_key]
                 else:
                     del doc[to_unset]
             except (KeyError, IndexError, ValueError):
